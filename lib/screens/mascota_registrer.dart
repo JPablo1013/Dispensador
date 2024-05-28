@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest_all.dart' as tz;
 
 class MascotaRegistrer extends StatefulWidget {
   const MascotaRegistrer({Key? key}) : super(key: key);
@@ -36,6 +37,9 @@ class _MascotaRegistrerState extends State<MascotaRegistrer> {
         onDidReceiveNotificationResponse: (NotificationResponse response) {
       // Manejar la respuesta a la notificación aquí
     });
+
+    // Inicializar la zona horaria para las notificaciones programadas
+    tz.initializeTimeZones();
   }
 
   Future<void> _showNotification(String title, String body) async {
@@ -123,6 +127,7 @@ class _MascotaRegistrerState extends State<MascotaRegistrer> {
     });
 
     _showNotification('Información Guardada', 'La información de tu mascota ha sido guardada.');
+    _scheduleNotification('Recordatorio', 'La información de tu mascota se guardó hace 15 segundos.', Duration(seconds: 15));
   }
 
   void runExampleTimer() {

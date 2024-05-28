@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dispensador/screens/mascota_registrer.dart';
+import 'package:dispensador/screens/bluetooth_screen.dart'; // Asegúrate de que la ruta de importación sea correcta
 
 void main() {
   runApp(MascotaApp());
@@ -16,6 +17,7 @@ class MascotaApp extends StatelessWidget {
       home: HomeScreen(),
       routes: {
         '/mascotaRegister': (context) => MascotaRegistrer(),
+        '/bluetooth': (context) => BluetoothScreen(), // Agrega esta línea
       },
     );
   }
@@ -92,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
             tileColor: Color.fromARGB(255, 64, 126, 196),
             title: Text('Mascotas'),
             subtitle: Text('Mis Mascotas'),
-            leading: Icon(Icons.key),
+            leading: Icon(Icons.pets),
             trailing: Icon(Icons.chevron_right),
             onTap: () async {
               final result = await Navigator.pushNamed(context, '/mascotaRegister');
@@ -105,9 +107,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           ListTile(
             tileColor: Color.fromARGB(255, 64, 126, 196),
-            title: Text('Bluethooth'),
-            subtitle: Text('Conexion a mis dispensadores'),
-            leading: Icon(Icons.key),
+            title: Text('Bluetooth'),
+            subtitle: Text('Conexión a mis dispensadores'),
+            leading: Icon(Icons.bluetooth),
             trailing: Icon(Icons.chevron_right),
             onTap: () => Navigator.pushNamed(context, '/bluetooth'),
           ),

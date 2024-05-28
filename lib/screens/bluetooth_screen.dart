@@ -1,29 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-void main() => runApp(BluetoothApp());
-
-class BluetoothApp extends StatelessWidget {
+class BluetoothScreen extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Bluetooth Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: BluetoothPage(),
-    );
-  }
+  _BluetoothScreenState createState() => _BluetoothScreenState();
 }
 
-class BluetoothPage extends StatefulWidget {
-  @override
-  _BluetoothPageState createState() => _BluetoothPageState();
-}
-
-class _BluetoothPageState extends State<BluetoothPage> {
+class _BluetoothScreenState extends State<BluetoothScreen> {
   BluetoothState _bluetoothState = BluetoothState.UNKNOWN;
   FlutterBluetoothSerial _bluetooth = FlutterBluetoothSerial.instance;
   List<BluetoothDevice> _devicesList = [];
@@ -60,20 +47,19 @@ class _BluetoothPageState extends State<BluetoothPage> {
   }
 
   Future<void> _requestPermissions() async {
-  if (await Permission.bluetooth.isDenied) {
-    await Permission.bluetooth.request();
+    if (await Permission.bluetooth.isDenied) {
+      await Permission.bluetooth.request();
+    }
+    if (await Permission.bluetoothScan.isDenied) {
+      await Permission.bluetoothScan.request();
+    }
+    if (await Permission.bluetoothConnect.isDenied) {
+      await Permission.bluetoothConnect.request();
+    }
+    if (await Permission.location.isDenied) {
+      await Permission.location.request();
+    }
   }
-  if (await Permission.bluetoothScan.isDenied) {
-    await Permission.bluetoothScan.request();
-  }
-  if (await Permission.bluetoothConnect.isDenied) {
-    await Permission.bluetoothConnect.request();
-  }
-  if (await Permission.location.isDenied) {
-    await Permission.location.request();
-  }
-}
-
 
   void _startDiscovery() {
     if (_bluetoothState.isEnabled) {
@@ -108,47 +94,46 @@ class _BluetoothPageState extends State<BluetoothPage> {
   }
 
   void _connect() async {
-  if (_device == null) {
-    print('No device selected');
-    return;
-  }
+    if (_device == null) {
+      print('No device selected');
+      return;
+    }
 
-  if (!_bluetoothState.isEnabled) {
-    print('Bluetooth is not enabled');
-    return;
-  }
+    if (!_bluetoothState.isEnabled) {
+      print('Bluetooth is not enabled');
+      return;
+    }
 
-  setState(() {
-    _isConnecting = true;
-  });
-
-  try {
-    BluetoothConnection connection =
-        await BluetoothConnection.toAddress(_device!.address).timeout(Duration(seconds: 10));
     setState(() {
-      _connectedDevice = _device;
-      _isConnecting = false;
-      _connection = connection;
+      _isConnecting = true;
     });
-    print('Connected to the device');
-    _connection!.input!.listen((data) {
-      // Listener para recibir datos
-    }).onDone(() {
-      print('Disconnected by remote request');
-      _disconnect();
-    });
-  } catch (e) {
-    print('Cannot connect, exception occurred: ${e.toString()}');
-    setState(() {
-      _isConnecting = false;
-      _connectedDevice = null;
-    });
-    Future.delayed(Duration(seconds: 5), () {
-      _connect();
-    });
-  }
-}
 
+    try {
+      BluetoothConnection connection =
+          await BluetoothConnection.toAddress(_device!.address).timeout(Duration(seconds: 10));
+      setState(() {
+        _connectedDevice = _device;
+        _isConnecting = false;
+        _connection = connection;
+      });
+      print('Connected to the device');
+      _connection!.input!.listen((data) {
+        // Listener para recibir datos
+      }).onDone(() {
+        print('Disconnected by remote request');
+        _disconnect();
+      });
+    } catch (e) {
+      print('Cannot connect, exception occurred: ${e.toString()}');
+      setState(() {
+        _isConnecting = false;
+        _connectedDevice = null;
+      });
+      Future.delayed(Duration(seconds: 5), () {
+        _connect();
+      });
+    }
+  }
 
   void _disconnect() async {
     if (_connection != null) {
